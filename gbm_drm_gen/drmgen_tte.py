@@ -125,10 +125,23 @@ class DRMGenTTE(DRMGen):
                 in_edge = custom_input_edges.edges
 
         # Create the out edge energies
-        with fits.open(cspecfile) as f:
-            out_edge = np.zeros(129, dtype=np.float32)
-            out_edge[:-1] = f["EBOUNDS"].data["E_MIN"]
-            out_edge[-1] = f["EBOUNDS"].data["E_MAX"][-1]
+        # >>> Jun Yang edited >>>
+        if cspecfile is None:
+
+            assert tte_file is not None
+
+            with fits.open(tte_file) as f:
+                out_edge = np.zeros(129, dtype=np.float32)
+                out_edge[:-1] = f["EBOUNDS"].data["E_MIN"]
+                out_edge[-1] = f["EBOUNDS"].data["E_MAX"][-1]
+
+        else:
+      
+            with fits.open(cspecfile) as f:
+                out_edge = np.zeros(129, dtype=np.float32)
+                out_edge[:-1] = f["EBOUNDS"].data["E_MIN"]
+                out_edge[-1] = f["EBOUNDS"].data["E_MAX"][-1]
+        # <<< Jun Yang edited <<<
 
         out_edge = out_edge
 
