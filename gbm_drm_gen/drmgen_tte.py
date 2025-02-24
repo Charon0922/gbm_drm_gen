@@ -95,6 +95,11 @@ class DRMGenTTE(DRMGen):
 
                     det_name = det_name_lookup2[det_name]
 
+        # >>> Jun Yang edited >>>
+        if det_name in det_name_lookup2:
+            det_name = det_name_lookup2[det_name]
+        # <<< Jun Yang edited <<<
+            
         det_number = det_name_lookup[det_name]
 
         if det_number > 11:
