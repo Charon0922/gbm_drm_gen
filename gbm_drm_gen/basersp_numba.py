@@ -28,15 +28,46 @@ lu = dict(
     b1="BGO_01",
 )
 
-import pkg_resources
+try:
+    from importlib.resources import files as _ir_files
+except Exception:
+    try:
+        from importlib_resources import files as _ir_files
+    except Exception:
+        _ir_files = None
+
+# Prefer importlib.resources; only import pkg_resources when needed as a fallback
 
 import h5py
 
 
 def get_path_of_data_file(data_file):
-    file_path = pkg_resources.resource_filename("gbm_drm_gen", "data/%s" % data_file)
+    """Return path to a data file inside the package.
 
-    return file_path
+    Use importlib.resources.files when available; fall back to pkg_resources
+    only at runtime if necessary (to avoid importing pkg_resources at module
+    import time and triggering deprecation warnings).
+    """
+    if _ir_files is not None:
+        data_dir = _ir_files("gbm_drm_gen").joinpath("data")
+        try:
+            return str(data_dir.joinpath(data_file))
+        except Exception:
+            try:
+                return str(data_dir / data_file)
+            except Exception:
+                pass
+
+    # Fallback: import pkg_resources locally to avoid top-level deprecation warnings
+    try:
+        import pkg_resources
+
+        return pkg_resources.resource_filename("gbm_drm_gen", "data/%s" % data_file)
+    except Exception:
+        # Last resort: relative path
+        import os
+
+        return os.path.join(os.path.dirname(__file__), os.pardir, "data", data_file)
 
 
 path_to_balrog_db = get_path_of_data_file("balrog_db.h5")
@@ -81,7 +112,9 @@ class DetDatabase_numba(object):
 
             if key[0] == "z":
 
-                match = re.match("^z0*(\d+)_az0*(\d+)$", key)
+                match = re.match(r"^z0*(\d+)_az0*(\d+)$", key)
+                if not match:
+                    continue
                 z, az = map(str, match.groups())
 
                 self._rsps["%s_%s" % (az, z)] = np.ascontiguousarray(value[()])
@@ -194,7 +227,9 @@ class TrigdatPrecalcDetDatabase_numba(object):
 
             if key[0] == "z":
 
-                match = re.match("^z0*(\d+)_az0*(\d+)$", key)
+                match = re.match(r"^z0*(\d+)_az0*(\d+)$", key)
+                if not match:
+                    continue
                 z, az = map(str, match.groups())
 
                 self._rsps["%s_%s" % (az, z)] = np.ascontiguousarray(value[()][:,mask])
