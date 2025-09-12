@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel", "versioneer[toml]"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gbm_drm_gen"
+description = "A DRM generator for the Fermi GBM detectors"
+readme = {file = "README.md", content-type = "text/markdown"}
+requires-python = ">=2.7.0"
+license = {text = "GPL3"}
+authors = [
+    {name = "J. Michael Burgess", email = "jmichaelburgess@gmail.com"}
+]
+dynamic = ["version"]
+dependencies = [
+    "astropy",
+    "numpy",
+    "scipy",
+    "h5py",
+    "numba",
+    "responsum",
+    "gbmgeometry",
+]
+
+[project.urls]
+Homepage = "https://github.com/grburgess/gbm_drm_gen"
+"Bug Tracker" = "https://github.com/grburgess/gbm_drm_gen/issues"
+"Source Code" = "https://github.com/grburgess/gbm_drm_gen"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-codecov",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.versioneer]
+VCS = "git"
+style = "pep440"
+versionfile_source = "gbm_drm_gen/_version.py"
+versionfile_build = "gbm_drm_gen/_version.py"
+tag_prefix = "v"
+parentdir_prefix = "gbm_drm_gen-"
